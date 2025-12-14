@@ -21,7 +21,8 @@
 ### 2. ⚡ 实时会话推荐 (Session-based Recs)
 - **动态感知**：系统实时捕捉用户的点击、切歌、收藏行为。
 - **短期兴趣**：基于用户最近 20 次交互构建短期兴趣窗口，实时调整推荐列表。
-- **近线架构**：利用 **Kafka** 异步上报行为日志，**Redis** 存储实时特征，保证低延迟。
+- **近线架构 (可选)**：支持利用 **Kafka** 异步上报行为日志，**Redis** 存储实时特征。
+  > **注**：系统内置自动降级机制。若未配置 Redis/Kafka，系统将自动切换为纯内存模式运行，不影响核心推荐功能。
 
 ### 3. 📊 音乐可视化 (Music Visualization)
 - **雷达图**：直观展示歌曲的 6 大核心音频特征（Energy, Danceability, Valence, Acousticness, Speechiness, Liveness）。
@@ -40,12 +41,12 @@
 ### 模型架构：MLP Autoencoder
 ```mermaid
 graph LR
-    Input[输入层 (13维特征)] -->|压缩| Enc1[Hidden (128)]
-    Enc1 --> Enc2[Hidden (64)]
-    Enc2 --> Latent[Latent Vector (32维)]
-    Latent -->|重构| Dec1[Hidden (64)]
-    Dec1 --> Dec2[Hidden (128)]
-    Dec2 --> Output[输出层 (13维)]
+    Input["输入层 (13维特征)"] -->|压缩| Enc1["Hidden (128)"]
+    Enc1 --> Enc2["Hidden (64)"]
+    Enc2 --> Latent["Latent Vector (32维)"]
+    Latent -->|重构| Dec1["Hidden (64)"]
+    Dec1 --> Dec2["Hidden (128)"]
+    Dec2 --> Output["输出层 (13维)"]
 ```
 
 - **输入特征**：Danceability, Energy, Valence, Tempo, Loudness, Key, Mode 等 13 维特征。
@@ -103,6 +104,10 @@ SPOTIPY_CLIENT_SECRET=your_spotify_client_secret
 
 # 选填 (Flask Session 密钥)
 FLASK_SECRET=random_secret_key
+
+# 选填 (中间件配置 - 不填则自动降级)
+# REDIS_URL=redis://...
+# KAFKA_BOOTSTRAP_SERVERS=...
 ```
 
 ### 3. 运行应用
