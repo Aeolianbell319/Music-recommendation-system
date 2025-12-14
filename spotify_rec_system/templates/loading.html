@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统初始化中 - Spotify 推荐系统</title>
+    <style>
+        body {
+            font-family: 'Circular', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: radial-gradient(circle at center, #1e3a29 0%, #000000 100%);
+        }
+        .loader-container {
+            text-align: center;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid #1DB954;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 30px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        p {
+            color: #b3b3b3;
+            font-size: 14px;
+            max-width: 400px;
+            line-height: 1.5;
+        }
+        .progress-container {
+            width: 300px;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin: 20px auto;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #1DB954;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .status-text {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #1DB954;
+            font-family: monospace;
+        }
+    </style>
+    <script>
+        function checkStatus() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ready) {
+                        window.location.reload();
+                    } else {
+                        // Update progress
+                        if (data.progress) {
+                            const percent = data.progress.percent;
+                            const message = data.progress.message;
+                            document.getElementById('progress-bar').style.width = percent + '%';
+                            document.getElementById('status-text').innerText = message + ' (' + percent + '%)';
+                        }
+                        setTimeout(checkStatus, 500);
+                    }
+                })
+                .catch(err => {
+                    console.error('Error checking status:', err);
+                    setTimeout(checkStatus, 2000);
+                });
+        }
+        window.onload = checkStatus;
+    </script>
+</head>
+<body>
+    <div class="loader-container">
+        <div class="spinner"></div>
+        <h2>正在启动 AI 引擎</h2>
+        <p>系统正在加载深度学习模型并构建音乐特征空间。如果是首次运行，可能需要几十秒进行训练。</p>
+        
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        
+        <div id="status-text" class="status-text">Loading Neural Network...</div>
+    </div>
+</body>
+</html>

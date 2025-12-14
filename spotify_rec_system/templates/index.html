@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - Spotify 音乐推荐系统</title>
+    <style>
+        body {
+            font-family: 'Circular', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            /* 使用 Spotify 标志性的绿色和黑色渐变，并叠加一个巨大的 Logo 水印 */
+            background: radial-gradient(circle at center, #1e3a29 0%, #000000 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        /* 背景大 Logo 水印 */
+        .bg-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80vh;
+            height: 80vh;
+            opacity: 0.05;
+            pointer-events: none;
+            fill: white;
+        }
+        .login-container {
+            background-color: #000000;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            width: 400px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 1;
+        }
+        .logo {
+            width: 80px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 32px;
+            margin-bottom: 30px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+        p {
+            color: #b3b3b3;
+            font-size: 14px;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+        .btn-login {
+            background-color: #1DB954;
+            color: black;
+            padding: 16px 40px;
+            border-radius: 500px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: transform 0.1s, background-color 0.1s;
+            display: inline-block;
+            width: auto;
+            box-sizing: border-box;
+        }
+        .btn-login:hover {
+            background-color: #1ed760;
+            transform: scale(1.02);
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #535353;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Spotify Recommendation System</h1>
+        <p>连接您的 Spotify 账号以分析您的听歌偏好，并获取个性化的音乐推荐。</p>
+        
+        <a href="/login" class="btn-login">使用 Spotify 登录</a>
+        
+        <div class="footer">
+            安全连接 • 官方 API 支持
+        </div>
+    </div>
+</body>
+</html>

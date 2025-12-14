@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歌单特征数据分析</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: white; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h2 { border-bottom: 1px solid #333; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background-color: #282828; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #404040; }
+        th { background-color: #181818; color: #b3b3b3; }
+        tr:hover { background-color: #333; }
+        .feature-val { font-family: monospace; color: #1DB954; }
+        .btn { background-color: #1DB954; color: white; padding: 10px 20px; text-decoration: none; border-radius: 20px; display: inline-block; margin-bottom: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-logout { background-color: transparent; border: 1px solid #b3b3b3; color: #b3b3b3; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 14px; transition: 0.3s; }
+        .btn-logout:hover { border-color: white; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/select_playlist" class="btn">返回歌单列表</a>
+            <a href="/logout" class="btn-logout">退出登录</a>
+        </div>
+        <h2>歌单数据透视 (前 100 首)</h2>
+        <p>如果你想自己写推荐算法，这些就是你需要的基础数据 (Audio Features)。</p>
+        
+        {% if error %}
+        <div style="background-color: #b91d1d; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            {{ error | safe }}
+        </div>
+        {% endif %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>封面</th>
+                    <th>歌曲名</th>
+                    <th>歌手</th>
+                    <th>流派 (Genres)</th>
+                    <th>Danceability</th>
+                    <th>Energy</th>
+                    <th>Valence</th>
+                    <th>Acousticness</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for track in tracks %}
+                <tr>
+                    <td>
+                        {% if track.album_art %}
+                        <img src="{{ track.album_art }}" alt="Cover" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                        {% else %}
+                        <div style="width: 50px; height: 50px; background-color: #333; border-radius: 4px;"></div>
+                        {% endif %}
+                    </td>
+                    <td>{{ track.name }}</td>
+                    <td>{{ track.artist }}</td>
+                    <td class="feature-val" style="font-size: 0.8em; color: #aaa;">{{ track.features.genres }}</td>
+                    <td class="feature-val">{{ track.features.danceability }}</td>
+                    <td class="feature-val">{{ track.features.energy }}</td>
+                    <td class="feature-val">{{ track.features.valence }}</td>
+                    <td class="feature-val">{{ track.features.acousticness }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

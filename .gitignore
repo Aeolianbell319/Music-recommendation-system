@@ -1,0 +1,42 @@
+# Python 编译和缓存文件
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+
+# 虚拟环境
+venv/
+.venv/
+env/
+ENV/
+
+# IDE 和编辑器配置
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 环境变量和敏感信息
+.env
+.env.local
+
+# 项目特定 - 数据文件 (忽略大文件)
+spotify_rec_system/data/*.csv
+spotify_rec_system/data/*.zip
+spotify_rec_system/data/*.tar.gz
+
+# 项目特定 - 模型和缓存 (忽略模型权重和嵌入向量)
+*.pth
+*.npy
+spotify_rec_system/model_cache/*
+
+# 保留 model_cache 目录结构 (不忽略 .gitkeep)
+!spotify_rec_system/model_cache/.gitkeep
+
+# 日志文件
+*.log

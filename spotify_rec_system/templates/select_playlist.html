@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选择歌单 - Spotify 推荐系统</title>
+    <style>
+        body { 
+            font-family: 'Circular', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #121212; 
+            color: white; 
+            margin: 0; 
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Top Navigation Bar */
+        .top-bar {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        
+        .spotify-logo {
+            width: 32px;
+            height: 32px;
+            fill: white;
+        }
+
+        .user-menu {
+            position: relative;
+            background-color: rgba(0,0,0,0.7);
+            border-radius: 23px;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-right: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .user-menu:hover {
+            background-color: #282828;
+        }
+        /* Fix for dropdown gap issue */
+        .user-menu::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            height: 10px;
+        }
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            background-color: #535353;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            object-fit: cover;
+        }
+        .user-name {
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: #282828;
+            border-radius: 4px;
+            padding: 4px;
+            box-shadow: 0 16px 24px rgba(0,0,0,0.5);
+            display: none;
+            min-width: 160px;
+            margin-top: 8px;
+        }
+        .user-menu:hover .user-dropdown { display: block; }
+        .dropdown-item {
+            display: block;
+            padding: 10px 12px;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            font-size: 14px;
+            border-radius: 2px;
+        }
+        .dropdown-item:hover { background-color: rgba(255,255,255,0.1); }
+
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 32px;
+            flex: 1;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        h2 { font-size: 24px; font-weight: 700; margin-bottom: 24px; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 24px;
+        }
+
+        .playlist-card {
+            background-color: #181818;
+            padding: 16px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            border: none;
+            text-align: left;
+            width: 100%;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .playlist-card:hover {
+            background-color: #282828;
+        }
+        
+        .img-container {
+            width: 100%;
+            aspect-ratio: 1;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            border-radius: 4px;
+            overflow: hidden;
+            background-color: #333;
+            position: relative;
+        }
+        .playlist-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Play Button on Hover */
+        .play-btn-overlay {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 48px;
+            height: 48px;
+            background-color: #1DB954;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 8px rgba(0,0,0,0.3);
+        }
+        .playlist-card:hover .play-btn-overlay {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .play-icon {
+            width: 24px;
+            height: 24px;
+            fill: black;
+            margin-left: 4px; /* Visual correction */
+        }
+        
+        .playlist-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .playlist-desc {
+            font-size: 14px;
+            color: #b3b3b3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="logo-container">
+            <svg class="spotify-logo" viewBox="0 0 167.5 167.5">
+                <path d="M83.8,0C37.6,0,0,37.6,0,83.8c0,46.2,37.6,83.8,83.8,83.8c46.2,0,83.8-37.6,83.8-83.8 C167.5,37.6,129.9,0,83.8,0z M121.2,120.8c-1.5,2.5-4.6,3.3-7.1,1.8c-19.5-11.9-44-14.6-72.9-8c-2.8,0.6-5.6-1.1-6.2-3.9 c-0.6-2.8,1.1-5.6,3.9-6.2c31.6-7.2,59-4.2,80.6,9C122,115.1,122.8,118.2,121.2,120.8z M131.4,97.9c-1.9,3.1-5.9,4.1-9,2.2 c-22.5-13.8-56.8-17.8-83.4-9.7c-3.4,1-7-0.9-8-4.3c-1-3.4,0.9-7,4.3-8c30.4-9.2,68.3-4.8,93.9,11 C132.3,91.1,133.3,95,131.4,97.9z M132.2,74.2c-27-16-71.5-17.5-97.3-9.6c-4.1,1.2-8.4-1.1-9.6-5.2c-1.2-4.1,1.1-8.4,5.2-9.6 c29.7-9,78.6-7.3,109.8,11.2c3.7,2.2,4.9,6.9,2.7,10.6C140.8,75.3,135.9,76.4,132.2,74.2z"/>
+            </svg>
+            <span>Spotify Recommendation System</span>
+        </div>
+        <div style="display:flex; gap:12px;">
+            <a href="/songs" style="color:#b3b3b3; text-decoration:none; font-weight:700;">歌曲列表</a>
+            <a href="/select_playlist" style="color:#b3b3b3; text-decoration:none; font-weight:700;">我的歌单</a>
+        </div>
+        <div class="user-menu">
+            {% if user_profile and user_profile.images %}
+            <img src="{{ user_profile.images[0].url }}" class="user-avatar">
+            {% else %}
+            <div class="user-avatar" style="background: #535353; display: flex; align-items: center; justify-content: center;">
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="white"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/></svg>
+            </div>
+            {% endif %}
+            <span class="user-name">{{ user_profile.display_name if user_profile else 'User' }}</span>
+            <svg viewBox="0 0 16 16" width="16" height="16" fill="white"><path d="M3 6l5 5 5-5z"/></svg>
+            
+            <div class="user-dropdown">
+                <a href="/logout" class="dropdown-item">退出登录</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>您的歌单库</h2>
+        
+        <div class="grid">
+            {% for playlist in playlists %}
+            <form action="/playlist" method="GET" style="display: contents;">
+                <input type="hidden" name="playlist_id" value="{{ playlist.id }}">
+                <button type="submit" class="playlist-card">
+                    <div class="img-container">
+                        {% if playlist.image %}
+                        <img src="{{ playlist.image }}" alt="{{ playlist.name }}" class="playlist-img">
+                        {% else %}
+                        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #555;">
+                            <span>No Cover</span>
+                        </div>
+                        {% endif %}
+                        <div class="play-btn-overlay">
+                            <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                    <div class="playlist-name">{{ playlist.name }}</div>
+                    <div class="playlist-desc">By {{ user_profile.display_name if user_profile else 'You' }} • {{ playlist.total_tracks }} 首歌曲</div>
+                </button>
+            </form>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

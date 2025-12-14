@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ track.name }} - 歌曲详情</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: white; padding: 40px; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background-color: #181818; padding: 40px; border-radius: 8px; width: 100%; max-width: 800px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .header { display: flex; align-items: flex-end; margin-bottom: 40px; }
+        .cover { width: 200px; height: 200px; box-shadow: 0 4px 20px rgba(0,0,0,0.6); margin-right: 30px; }
+        .info h1 { font-size: 42px; margin: 0 0 10px 0; font-weight: 900; }
+        .info h2 { font-size: 24px; margin: 0; color: #b3b3b3; font-weight: normal; }
+        .meta { margin-top: 10px; color: #b3b3b3; font-size: 14px; }
+        
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
+        @media (max-width: 768px) {
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .feature-box { background-color: #282828; padding: 20px; border-radius: 6px; text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100px; }
+        .feature-label { color: #b3b3b3; font-size: 12px; letter-spacing: 1px; margin-bottom: 10px; }
+        .feature-value { font-size: 24px; font-weight: bold; color: #1DB954; font-family: monospace; }
+        
+        .btn-back { display: inline-block; margin-bottom: 20px; color: #b3b3b3; text-decoration: none; }
+        .btn-back:hover { color: white; }
+        
+        .btn-play {
+            display: inline-block;
+            background-color: #1DB954;
+            color: black;
+            padding: 12px 32px;
+            border-radius: 500px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            transition: transform 0.1s, background-color 0.1s;
+        }
+        .btn-play:hover {
+            transform: scale(1.05);
+            background-color: #1ed760;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <a href="javascript:history.back()" class="btn-back">← 返回歌单</a>
+        
+        <div class="header">
+            {% if track.album_art %}
+            <img src="{{ track.album_art }}" class="cover">
+            {% else %}
+            <div class="cover" style="background: #333;"></div>
+            {% endif %}
+            <div class="info">
+                <p style="font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 5px;">SONG</p>
+                <h1>{{ track.name }}</h1>
+                <h2>{{ track.artist }}</h2>
+                <div class="meta">
+                    <span>{{ track.release_date }}</span> • 
+                    <span>Popularity: {{ track.popularity }}%</span>
+                </div>
+                <a href="{{ track.external_url }}" target="_blank" class="btn-play">在 Spotify 上播放</a>
+            </div>
+        </div>
+
+        <h3 style="border-bottom: 1px solid #333; padding-bottom: 10px;">音频特征分析 (Audio Features)</h3>
+        
+        <div class="features-grid">
+            <div class="feature-box">
+                <div class="feature-label">舞曲性</div>
+                <div class="feature-value">{{ features.danceability }}</div>
+            </div>
+            <div class="feature-box">
+                <div class="feature-label">能量</div>
+                <div class="feature-value">{{ features.energy }}</div>
+            </div>
+            <div class="feature-box">
+                <div class="feature-label">情绪</div>
+                <div class="feature-value">{{ features.valence }}</div>
+            </div>
+            <div class="feature-box">
+                <div class="feature-label">原声</div>
+                <div class="feature-value">{{ features.acousticness }}</div>
+            </div>
+            <div class="feature-box">
+                <div class="feature-label">器乐</div>
+                <div class="feature-value">{{ features.instrumentalness }}</div>
+            </div>
+            <div class="feature-box">
+                <div class="feature-label">节奏 (BPM)</div>
+                <div class="feature-value">{{ features.tempo }}</div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #222; border-radius: 6px;">
+            <div class="feature-label">流派 (Genres)</div>
+            <div style="color: white; margin-top: 5px;">{{ features.genre }}</div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+Flask
+spotipy
+pandas
+numpy
+scikit-learn
+torch
+python-dotenv
+requests
+kafka-python
+redis

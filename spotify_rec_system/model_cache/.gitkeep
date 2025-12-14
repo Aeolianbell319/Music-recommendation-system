@@ -1,0 +1,2 @@
+# placeholder to keep model_cache directory in repository
+# Do not store model weights here in the repo; use Git LFS or keep them locally.

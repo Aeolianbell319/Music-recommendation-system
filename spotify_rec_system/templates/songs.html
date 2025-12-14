@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歌曲列表 - Spotify 风格</title>
+    <style>
+        body { font-family: 'Circular', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #fff; margin: 0; min-height: 100vh; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; position: sticky; top: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); z-index: 10; }
+        .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -0.5px; }
+        .brand svg { width: 28px; height: 28px; fill: #1DB954; }
+        .nav { display: flex; gap: 12px; }
+        .nav a { color: #b3b3b3; text-decoration: none; font-weight: 700; padding: 8px 12px; border-radius: 8px; }
+        .nav a.active, .nav a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 24px 32px 60px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .header h1 { margin: 0; font-size: 28px; letter-spacing: -1px; }
+        .badge { background: #1DB954; color: #000; padding: 4px 10px; border-radius: 999px; font-size: 12px; margin-left: 8px; font-weight: 800; }
+
+        .filters { background: #181818; border: 1px solid #262626; padding: 16px; border-radius: 10px; display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 12px; margin-bottom: 16px; }
+        .filters label { font-size: 12px; color: #b3b3b3; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .filters input, .filters select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #2e2e2e; background: #121212; color: #fff; font-size: 14px; }
+        .filters button { background: #1DB954; color: #000; border: none; border-radius: 8px; padding: 12px; font-weight: 800; cursor: pointer; letter-spacing: 0.5px; }
+        .filters button:hover { background: #1ed760; }
+
+        .list { background: #181818; border: 1px solid #262626; border-radius: 10px; overflow: hidden; }
+        .list-header, .row { display: grid; grid-template-columns: 60px 2fr 1.6fr 1fr 90px 190px; align-items: center; padding: 12px 16px; column-gap: 10px; }
+        .list-header { font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; color: #b3b3b3; border-bottom: 1px solid #262626; }
+        .row { border-bottom: 1px solid #202020; color: #e5e5e5; }
+        .row:hover { background: rgba(255,255,255,0.05); }
+        .row > div { min-width: 0; }
+        .actions { display:flex; gap:8px; }
+        .actions a, .actions button { border:none; border-radius:8px; padding:8px 10px; font-weight:700; cursor:pointer; font-size:12px; text-decoration:none; }
+        .btn-detail { background:#1DB954; color:#000; }
+        .btn-like { background:#2a2a2a; color:#fff; border:1px solid #333; }
+        .btn-dislike { background:#b91c1c; color:#fff; border:none; }
+        .title { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .artist { color: #b3b3b3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .genre { color: #8dd9a6; font-weight: 700; }
+        .year { color: #ccc; font-variant-numeric: tabular-nums; }
+        .pop { text-align: right; font-variant-numeric: tabular-nums; }
+
+        .pager { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; color: #b3b3b3; font-size: 14px; }
+        .pager a { color: #fff; text-decoration: none; background: #181818; border: 1px solid #262626; padding: 8px 12px; border-radius: 6px; }
+        .pager a[aria-disabled="true"] { opacity: 0.4; pointer-events: none; }
+        .reco-item { display:flex; align-items:center; padding:10px; background:#202020; border-radius:8px; border:1px solid #262626; gap:8px; }
+        .reco-meta { display:flex; flex-direction:column; gap:4px; min-width:0; flex:1; }
+        .reco-title { font-weight:700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .reco-artist { color:#b3b3b3; font-size:13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .reco-genre { color:#8dd9a6; font-size:12px; }
+        .reco-link { flex-shrink:0; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="brand">
+            <svg viewBox="0 0 167.5 167.5"><path d="M83.8,0C37.6,0,0,37.6,0,83.8c0,46.2,37.6,83.8,83.8,83.8c46.2,0,83.8-37.6,83.8-83.8 C167.5,37.6,129.9,0,83.8,0z M121.2,120.8c-1.5,2.5-4.6,3.3-7.1,1.8c-19.5-11.9-44-14.6-72.9-8c-2.8,0.6-5.6-1.1-6.2-3.9 c-0.6-2.8,1.1-5.6,3.9-6.2c31.6-7.2,59-4.2,80.6,9C122,115.1,122.8,118.2,121.2,120.8z M131.4,97.9c-1.9,3.1-5.9,4.1-9,2.2 c-22.5-13.8-56.8-17.8-83.4-9.7c-3.4,1-7-0.9-8-4.3c-1-3.4,0.9-7,4.3-8c30.4-9.2,68.3-4.8,93.9,11 C132.3,91.1,133.3,95,131.4,97.9z M132.2,74.2c-27-16-71.5-17.5-97.3-9.6c-4.1,1.2-8.4-1.1-9.6-5.2c-1.2-4.1,1.1-8.4,5.2-9.6 c29.7-9,78.6-7.3,109.8,11.2c3.7,2.2,4.9,6.9,2.7,10.6C140.8,75.3,135.9,76.4,132.2,74.2z"/></svg>
+            <span>Spotify Recommendation</span>
+        </div>
+        <div class="nav">
+            <a href="/select_playlist">歌单</a>
+            <a class="active" href="/songs">歌曲列表</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>离线歌曲库 <span class="badge">CSV</span></h1>
+                <div style="color:#b3b3b3; font-size:14px; margin-top:6px;">来自离线数据集的样本列表，用于候选召回与质检。</div>
+            </div>
+            <div style="color:#b3b3b3; font-size:14px;">共 {{ total }} 首 · 第 {{ page }} / {{ total_pages }} 页</div>
+        </div>
+
+        <div class="layout" style="display:grid; grid-template-columns: 2fr 0.9fr; gap:24px; align-items:start;">
+            <div>
+                <form class="filters" method="get" action="/songs">
+                    <div>
+                        <label>关键词</label>
+                        <input type="text" name="q" value="{{ q }}" placeholder="歌曲或歌手关键词">
+                    </div>
+                    <div>
+                        <label>流派</label>
+                        <input type="text" name="genre" value="{{ genre }}" placeholder="如 acoustic / pop">
+                    </div>
+                    <div>
+                        <label>年份</label>
+                        <input type="number" name="year" value="{{ year }}" min="1900" max="2100" placeholder="2012">
+                    </div>
+                    <div>
+                        <label>排序</label>
+                        <select name="sort">
+                            <option value="popularity" {% if sort_by == 'popularity' %}selected{% endif %}>按热度</option>
+                            <option value="name" {% if sort_by == 'name' %}selected{% endif %}>按歌曲名称</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; align-items:flex-end;">
+                        <button type="submit">过滤</button>
+                    </div>
+                </form>
+
+                <div class="list">
+                    <div class="list-header">
+                        <div>#</div>
+                        <div>歌曲</div>
+                        <div>歌手</div>
+                        <div>流派 / 年份</div>
+                        <div style="text-align:right;">热度</div>
+                        <div style="text-align:right;">操作</div>
+                    </div>
+                    {% for item in tracks %}
+                    <div class="row">
+                        <div>{{ (page - 1) * 50 + loop.index }}</div>
+                        <div class="title">{{ item.track_name }}</div>
+                        <div class="artist">{{ item.artist_name }}</div>
+                        <div>
+                            <div class="genre">{{ item.genre }}</div>
+                            <div class="year">{{ item.year }}</div>
+                        </div>
+                        <div class="pop">{{ item.popularity }}</div>
+                        <div class="actions">
+                            <a class="btn-detail" href="/songs/{{ item.id }}?page={{ page }}&genre={{ genre }}&year={{ year }}&q={{ q }}&sort={{ sort_by }}">详情</a>
+                            <button type="button" class="btn-like" onclick="sendEvent('like','{{ item.id }}')">👍</button>
+                            <button type="button" class="btn-dislike" onclick="sendEvent('dislike','{{ item.id }}')">👎</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="pager">
+                    <a href="/songs?page={{ page - 1 }}&genre={{ genre }}&year={{ year }}&q={{ q }}&sort={{ sort_by }}" aria-disabled="{{ 'true' if page <= 1 else 'false' }}">上一页</a>
+                    <span>Page {{ page }} / {{ total_pages }}</span>
+                    <a href="/songs?page={{ page + 1 }}&genre={{ genre }}&year={{ year }}&q={{ q }}&sort={{ sort_by }}" aria-disabled="{{ 'true' if page >= total_pages else 'false' }}">下一页</a>
+                </div>
+                <form class="pager" style="margin-top:8px;" method="get" action="/songs">
+                    <div>跳转到第 <input type="number" name="page" value="{{ page }}" min="1" max="{{ total_pages }}" style="width:70px; padding:8px; border-radius:6px; border:1px solid #262626; background:#121212; color:#fff;"> 页</div>
+                    <input type="hidden" name="genre" value="{{ genre }}">
+                    <input type="hidden" name="year" value="{{ year }}">
+                    <input type="hidden" name="q" value="{{ q }}">
+                    <input type="hidden" name="sort" value="{{ sort_by }}">
+                    <button type="submit" style="background:#1DB954; color:#000; border:none; border-radius:8px; padding:8px 12px; font-weight:800; cursor:pointer;">跳转</button>
+                </form>
+            </div>
+
+            <div>
+                <div style="background:#181818; border:1px solid #262626; border-radius:10px; padding:16px; position:sticky; top:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <div style="font-weight:800; font-size:16px;">实时推荐</div>
+                        <button onclick="loadRecs()" style="background:#1DB954; color:#000; border:none; border-radius:8px; padding:6px 10px; font-weight:800; cursor:pointer;">刷新</button>
+                    </div>
+                    <div id="reco-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        async function sendEvent(type, trackId){
+            const toast = document.getElementById('toast');
+            try{
+                const resp = await fetch('/events',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({type:type, track_id:trackId, source:'songs_list'})
+                });
+                if(resp.ok){
+                    toast.innerText = (type === 'like') ? '已记录点赞' : '已记录不感兴趣';
+                    toast.style.opacity = '1';
+                    setTimeout(()=>{toast.style.opacity='0';}, 1200);
+                }
+            }catch(e){console.warn('event failed', e);}
+        }
+
+        async function loadRecs(){
+            const box = document.getElementById('reco-list');
+            box.innerHTML = '<div style="color:#b3b3b3;">加载中...</div>';
+            try{
+                const resp = await fetch('/api/songs_recommendations');
+                const data = await resp.json();
+                const tracks = data.tracks || [];
+                if(!tracks.length){
+                    box.innerHTML = '<div style="color:#b3b3b3;">暂无推荐</div>';
+                    return;
+                }
+                box.innerHTML = '';
+                const qs = window.location.search || '';
+                tracks.forEach(function(t){
+                    const item = document.createElement('div');
+                    item.className = 'reco-item';
+                    item.innerHTML = `<div class="reco-meta"><div class="reco-title" title="${t.name}">${t.name}</div><div class="reco-artist" title="${t.artist}">${t.artist}</div><div class="reco-genre">${t.genre || ''}</div></div><a class="reco-link" href="/songs/${t.id}${qs}" style="color:#1DB954; text-decoration:none; font-weight:800;">详情</a>`;
+                    box.appendChild(item);
+                });
+            }catch(e){
+                box.innerHTML = '<div style="color:#b3b3b3;">推荐加载失败</div>';
+            }
+        }
+
+        loadRecs();
+    </script>
+    <div id="toast" style="position:fixed; bottom:20px; right:20px; background:#1DB954; color:#000; padding:10px 14px; border-radius:8px; font-weight:800; opacity:0; transition:opacity 0.3s;"></div>
+</body>
+</html>

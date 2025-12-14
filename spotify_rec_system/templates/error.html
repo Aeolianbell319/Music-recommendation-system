@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提示 - Spotify 推荐系统</title>
+    <style>
+        body { 
+            font-family: 'Circular', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #121212; 
+            color: white; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            text-align: center; 
+        }
+        .container { 
+            max-width: 500px; 
+            padding: 40px; 
+            background-color: #181818; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5); 
+        }
+        .icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+        }
+        h1 { 
+            color: #fff; 
+            margin: 0 0 20px 0; 
+            font-size: 24px;
+        }
+        p { 
+            color: #b3b3b3; 
+            font-size: 16px; 
+            line-height: 1.6; 
+            margin-bottom: 30px; 
+        }
+        .btn { 
+            background-color: #1DB954; 
+            color: black; 
+            padding: 14px 32px; 
+            border-radius: 500px; 
+            text-decoration: none; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            transition: 0.3s; 
+            display: inline-block;
+        }
+        .btn:hover { 
+            background-color: #1ed760; 
+            transform: scale(1.05); 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="icon">🎵</span>
+        <h1>需要注意</h1>
+        <p>{{ message | safe }}</p>
+        <a href="/select_playlist" class="btn">返回歌单列表</a>
+    </div>
+</body>
+</html>
