@@ -29,7 +29,7 @@
 - **数据洞察**：帮助用户理解为什么这首歌会被推荐。
 
 ### 4. 🔄 双模式支持 (Dual Mode)
-- **离线模式 (Offline)**：内置 Kaggle 百万歌曲数据集 (CSV)，无需联网即可演示核心算法。
+- **离线模式 (Offline)**：内置 [Spotify 1 Million Tracks](https://www.kaggle.com/datasets/amitanshjoshi/spotify-1million-tracks) 数据集 (CSV)，无需联网即可演示核心算法。
 - **在线模式 (Online)**：集成 Spotify Web API，支持获取真实专辑封面、试听片段（需配置 API Key）。
 
 ---
@@ -91,7 +91,13 @@ source venv/bin/activate
 pip install -r spotify_rec_system/requirements.txt
 ```
 
-### 2. 配置环境变量
+### 2. 下载数据集
+本项目依赖 Kaggle 数据集。请下载 [Spotify 1 Million Tracks](https://www.kaggle.com/datasets/amitanshjoshi/spotify-1million-tracks) 并解压：
+1. 下载 `spotify_data.csv` (或类似名称)。
+2. 将其重命名为 `dataset.csv`。
+3. 放入 `spotify_rec_system/data/` 目录下。
+
+### 3. 配置环境变量
 复制示例配置文件：
 ```bash
 cp .env.example .env
@@ -110,7 +116,7 @@ FLASK_SECRET=random_secret_key
 # KAFKA_BOOTSTRAP_SERVERS=...
 ```
 
-### 3. 运行应用
+### 4. 运行应用
 ```bash
 cd spotify_rec_system
 python app.py
